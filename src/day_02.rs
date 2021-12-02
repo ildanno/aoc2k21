@@ -1,83 +1,94 @@
 use crate::input;
 
+#[derive(Debug, PartialEq)]
+enum Command {
+    Up(u32),
+    Down(u32),
+    Forward(u32),
+}
+
+struct Position { x: u32, y: u32, a: u32 }
+impl Position {
+    fn multiply(&self) -> u32 { self.x * self.y }
+}
+
 pub fn print_solution() {
     let data = get_input();
 
+    println!("# Day 2");
     println!("Part 1: {}", solve_part_1(&data));
     println!("Part 2: {}", solve_part_2(&data));
 }
 
-fn get_input() -> Vec<(String, u32)> {
+fn get_input() -> Vec<Command> {
     input::read("data/02.txt")
         .iter()
-        .map(parse_command)
+        .map(|x| parse_command(x).expect("Invalid command"))
         .collect()
 }
 
-fn parse_commands(input: &Vec<String>) -> Vec<(String, u32)> {
-    input
-        .iter()
-        .map(parse_command)
-        .collect()
-}
-
-fn parse_command(x: &String) -> (String, u32) {
+fn parse_command(x: &String) -> Result<Command, &str> {
     let p = x
         .split(" ")
-        .map(|x| String::from(x))
-        .collect::<Vec<String>>();
+        .map(|x| x)
+        .collect::<Vec<&str>>();
 
-    let direction = p.get(0).expect("eh");
-    let length = p.get(1).expect("meh").parse::<u32>().expect("mah");
+    let &direction = p
+        .get(0)
+        .expect("Cannot get direction from command string");
 
-    (String::from(direction), length)
+    let length = p
+        .get(1)
+        .expect("Cannot get length from command string")
+        .parse::<u32>()
+        .expect("Cannot parse length from command string");
+
+    match direction {
+        "up" => Ok(Command::Up(length)),
+        "down" => Ok(Command::Down(length)),
+        "forward" => Ok(Command::Forward(length)),
+        _ => Err("Invalid command")
+    }
 }
 
-fn solve_part_1(commands: &Vec<(String, u32)>) -> u32 {
-    let mut position_x = 0;
-    let mut position_y = 0;
-
-    for command in commands {
-        let direction = &command.0;
-        let lenght = command.1;
-
-        if direction.eq(&String::from("forward")) { position_x += lenght }
-        else if direction.eq(&String::from("down")) { position_y += lenght }
-        else if direction.eq(&String::from("up")) { position_y -= lenght }
-    }
-
-    return position_y * position_x;
+fn solve_part_1(commands: &Vec<Command>) -> u32 {
+    commands
+        .iter()
+        .fold(Position{x: 0, y: 0, a: 0}, |p, command| {
+            match command {
+                Command::Up(lenght) => Position{ y: p.y - lenght, ..p },
+                Command::Down(lenght) => Position{ y: p.y + lenght, ..p },
+                Command::Forward(lenght) => Position{ x: p.x + lenght, ..p }
+            }
+        })
+        .multiply()
 }
 
-fn solve_part_2(commands: &Vec<(String, u32)>) -> u32 {
-    let mut position_x = 0;
-    let mut position_y = 0;
-    let mut aim = 0;
-
-    for command in commands {
-        let direction = &command.0;
-        let lenght = command.1;
-
-        if direction.eq(&String::from("forward")) { position_x += lenght; position_y += aim * lenght }
-        else if direction.eq(&String::from("down")) { aim += lenght }
-        else if direction.eq(&String::from("up")) { aim -= lenght }
-    }
-
-    return position_y * position_x;
+fn solve_part_2(commands: &Vec<Command>) -> u32 {
+    commands
+        .iter()
+        .fold(Position{x: 0, y: 0, a: 0}, |p, command| {
+            match command {
+                Command::Up(lenght) => Position{ a: p.a - lenght, ..p },
+                Command::Down(lenght) => Position{ a: p.a + lenght, ..p },
+                Command::Forward(lenght) => Position{ x: p.x + lenght, y: p.y + p.a * lenght, ..p }
+            }
+        })
+        .multiply()
 }
 
 mod tests {
-    use crate::day_02::{get_input, parse_commands, solve_part_1, solve_part_2};
+    use crate::day_02::{Command, get_input, parse_command, solve_part_1, solve_part_2};
 
     #[test]
     fn test_solve_part_1() {
         let commands = vec![
-            (String::from("forward"), 5),
-            (String::from("down"), 5),
-            (String::from("forward"), 8),
-            (String::from("up"), 3),
-            (String::from("down"), 8),
-            (String::from("forward"), 2),
+            Command::Forward(5),
+            Command::Down(5),
+            Command::Forward(8),
+            Command::Up(3),
+            Command::Down(8),
+            Command::Forward(2),
         ];
         assert_eq!(150, solve_part_1(&commands))
     }
@@ -85,42 +96,43 @@ mod tests {
     #[test]
     fn test_solve_part_2() {
         let commands = vec![
-            (String::from("forward"), 5),
-            (String::from("down"), 5),
-            (String::from("forward"), 8),
-            (String::from("up"), 3),
-            (String::from("down"), 8),
-            (String::from("forward"), 2),
+            Command::Forward(5),
+            Command::Down(5),
+            Command::Forward(8),
+            Command::Up(3),
+            Command::Down(8),
+            Command::Forward(2),
         ];
         assert_eq!(900, solve_part_2(&commands))
     }
 
     #[test]
-    fn test_parse_commands() {
-        let input = vec![
-            String::from("forward 5"),
-            String::from("down 5"),
-            String::from("forward 8"),
-            String::from("up 3"),
-            String::from("down 8"),
-            String::from("forward 2"),
-        ];
+    fn test_parse_command() {
+        assert_eq!(
+            parse_command(&String::from("forward 5")),
+            Ok(Command::Forward(5))
+        );
 
         assert_eq!(
-            parse_commands(&input),
-            vec![
-                (String::from("forward"), 5),
-                (String::from("down"), 5),
-                (String::from("forward"), 8),
-                (String::from("up"), 3),
-                (String::from("down"), 8),
-                (String::from("forward"), 2),
-            ]
+            parse_command(&String::from("down 8")),
+            Ok(Command::Down(8))
+        );
+
+        assert_eq!(
+            parse_command(&String::from("up 3")),
+            Ok(Command::Up(3))
+        );
+
+        assert_eq!(
+            parse_command(&String::from("back 6")),
+            Err("Invalid command")
         )
     }
 
     #[test]
     fn test_golden_master_solution() {
-        assert_eq!(solve_part_1(&get_input()), 1868935)
+        let data = get_input();
+        assert_eq!(solve_part_1(&data), 1868935);
+        assert_eq!(solve_part_2(&data), 1965970888)
     }
 }

@@ -1,29 +1,25 @@
 use crate::input;
 
-pub fn part1() {
+pub fn print_solution() {
     let data = get_input();
 
-    println!("{}", solve_part1(&data));
-}
-
-pub fn part2() {
-    let data = get_input();
-
-    println!("{}", solve_part2(&data))
+    println!("# Day 1");
+    println!("Part 1: {}", solve_part_1(&data));
+    println!("Part 2: {}", solve_part_2(&data));
 }
 
 fn get_input() -> Vec<u32> {
-    input::read("data/1-1.txt")
+    input::read("data/01.txt")
         .iter()
         .map(|x| x.parse().expect("Cannot parse"))
         .collect::<Vec<u32>>()
 }
 
-fn solve_part1(depths: &Vec<u32>) -> u32 {
+fn solve_part_1(depths: &Vec<u32>) -> u32 {
     return window_solution(depths, 1);
 }
 
-fn solve_part2(depths: &Vec<u32>) -> u32 {
+fn solve_part_2(depths: &Vec<u32>) -> u32 {
     return window_solution(depths, 3);
 }
 
@@ -49,29 +45,26 @@ fn window_solution(depths: &Vec<u32>, window_size: u32) -> u32 {
 }
 
 mod tests {
-    use crate::day_01::{solve_part1, solve_part2};
+    use crate::day_01::{get_input, solve_part_1, solve_part_2};
     use crate::input;
 
     #[test]
     fn test_solve_part1() {
         let data: Vec<u32> = Vec::from([199, 200, 208, 210, 200, 207, 240, 269, 260, 263]);
-        assert_eq!(solve_part1(&data), 7)
+        assert_eq!(solve_part_1(&data), 7)
     }
 
     #[test]
     fn test_solve_part2() {
         let data: Vec<u32> = Vec::from([199, 200, 208, 210, 200, 207, 240, 269, 260, 263]);
-        assert_eq!(solve_part2(&data), 5)
+        assert_eq!(solve_part_2(&data), 5)
     }
 
     #[test]
     fn test_golden_master_solution() {
-        let data = input::read("data/1-1.txt")
-            .iter()
-            .map(|x| x.parse().expect("Cannot parse"))
-            .collect::<Vec<u32>>();
+        let data = get_input();
 
-        assert_eq!(solve_part1(&data), 1288);
-        assert_eq!(solve_part2(&data), 1311)
+        assert_eq!(solve_part_1(&data), 1288);
+        assert_eq!(solve_part_2(&data), 1311)
     }
 }
