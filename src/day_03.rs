@@ -2,23 +2,23 @@ use std::cmp::Ordering;
 use crate::input;
 
 pub fn print_solution() {
-    // let data = input::read("data/03.txt");
+    let data = input::read("data/03.txt");
 
     println!("# Day 3");
-    // println!("Part 1: {}", solve_part_1(&data));
+    println!("Part 1: {}", solve_part_1(&data));
     // println!("Part 2: {}", solve_part_2(&data));
 }
 
-fn solve_part_1(report: &Vec<&str>) -> i32 {
+fn solve_part_1(report: &Vec<String>) -> i32 {
     let mut gamma = String::new();
     let mut epsilon = String::new();
 
     for i in 0..report[0].len() {
         let sum = report
             .iter()
-            .map(|&x| x.get(i..i+1).expect("Out of range"))
-            .map(|x| x.parse::<u8>().expect("Not a valid digit"))
-            .sum::<u8>() as f64;
+            .map(|x| { x.get(i..i + 1).expect("Out of range") })
+            .map(|x| { x.parse::<u32>().expect("Not a valid digit") })
+            .sum::<u32>() as f64;
 
         gamma.push_str(match sum > (report.len() / 2) as f64 {
             true => { "1" }
@@ -44,6 +44,7 @@ fn binstr_to_int(bin: &str) -> i32 {
 
 mod tests {
     use crate::day_03::{binstr_to_int, solve_part_1};
+    use crate::input;
 
     #[test]
     fn test_binstr_to_int() {
@@ -54,20 +55,26 @@ mod tests {
     #[test]
     fn test_solve_part_1() {
         let report = vec![
-            "00100",
-            "11110",
-            "10110",
-            "10111",
-            "10101",
-            "01111",
-            "00111",
-            "11100",
-            "10000",
-            "11001",
-            "00010",
-            "01010",
+            String::from("00100"),
+            String::from("11110"),
+            String::from("10110"),
+            String::from("10111"),
+            String::from("10101"),
+            String::from("01111"),
+            String::from("00111"),
+            String::from("11100"),
+            String::from("10000"),
+            String::from("11001"),
+            String::from("00010"),
+            String::from("01010"),
         ];
 
         assert_eq!(solve_part_1(&report), 198)
+    }
+
+    #[test]
+    fn test_golden_master() {
+        let data = input::read("data/03.txt");
+        assert_eq!(solve_part_1(&data), 2003336);
     }
 }
