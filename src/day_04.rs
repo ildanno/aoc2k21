@@ -6,7 +6,7 @@ pub fn print_solution() {
 
     println!("# Day 4");
     println!("Part 1: {}", solve_part_1(&game));
-    // println!("Part 2: {}", solve_part_2(&data));
+    println!("Part 2: {}", solve_part_2(&game));
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -157,11 +157,31 @@ fn solve_part_1(game: &Game) -> u32 {
         .fold(0, |r, b| b.sum()) * last
 }
 
-// fn solve_part_2(report: &Vec<String>) -> i32 {
-// }
+fn solve_part_2(game: &Game) -> u32 {
+    let mut last = 0;
+    let boards = game.clone()
+        .called
+        .iter()
+        .fold(game.clone().boards, |boards, &num| {
+            if boards.len() == 1 && boards.get(0).expect("Empty list").is_winner() { return boards }
+
+            last = num;
+
+            let size = boards.len();
+            let boards = boards
+                .iter()
+                .map(|&b| b.mark(num))
+                .filter(|&b| size==1 || !b.is_winner())
+                .collect::<Vec<Board>>();
+
+            return boards
+        });
+
+    last * boards.get(0).expect("Empty list").sum()
+}
 
 mod tests {
-    use crate::day_04::{Board, Cell, Game, parse_input, solve_part_1};
+    use crate::day_04::{Board, Cell, Game, parse_input, solve_part_1, solve_part_2};
     use crate::input;
 
     #[test]
@@ -292,10 +312,22 @@ mod tests {
     }
 
     #[test]
+    fn test_solve_part_2() {
+        assert_eq!(
+            solve_part_2(&parse_input(&input::read("data/04-test.txt"))),
+            1924
+        )
+    }
+
+    #[test]
     fn test_golden_master() {
         assert_eq!(
             solve_part_1(&parse_input(&input::read("data/04.txt"))),
             8580
+        );
+        assert_eq!(
+            solve_part_2(&parse_input(&input::read("data/04.txt"))),
+            9576
         )
     }
 }
