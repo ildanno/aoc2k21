@@ -8,7 +8,7 @@ pub fn print_solution() {
 
     println!("# Day 5");
     println!("Part 1: {}", solve_part_1(&lines)); // warning: 13s exec time
-    // println!("Part 2: {}", solve_part_2(&data));
+    println!("Part 2: {}", solve_part_2(&lines)); // warning: 35s exec time!!
 }
 
 #[derive(Debug, PartialEq, Eq, Hash, Copy, Clone)]
@@ -40,24 +40,34 @@ impl Line {
 }
 
 fn solve_part_1(lines: &Vec<Line>) -> i32 {
-    let sets = lines
+    let filtered = lines
         .iter()
         .filter(|l| { l.start.x == l.end.x || l.start.y == l.end.y })
+        .map(|&l| l)
+        .collect::<Vec<Line>>()
+        ;
+
+    solve_common(&filtered)
+}
+
+fn solve_common(filter: &Vec<Line>) -> i32 {
+    let sets = filter
+        .iter()
         .fold((HashSet::new(), HashSet::new()), |y, l| {
             let points = l.covered_points();
             let union = y.0
                 .union(&points)
-                .map(|p| Point{x:p.x, y:p.y})
+                .map(|p| Point { x: p.x, y: p.y })
                 .collect::<HashSet<Point>>();
 
             let new_intersection = y.0
                 .intersection(&points)
-                .map(|p| Point{x:p.x, y:p.y})
+                .map(|p| Point { x: p.x, y: p.y })
                 .collect::<HashSet<Point>>();
 
             let intersection = y.1
                 .union(&new_intersection)
-                .map(|p| Point{x:p.x, y:p.y})
+                .map(|p| Point { x: p.x, y: p.y })
                 .collect::<HashSet<Point>>();
 
             (union, intersection)
@@ -66,8 +76,8 @@ fn solve_part_1(lines: &Vec<Line>) -> i32 {
     sets.1.len() as i32
 }
 
-fn solve_part_2() -> i32 {
-    0
+fn solve_part_2(lines: &Vec<Line>) -> i32 {
+    solve_common(&lines)
 }
 
 fn parse_input(data: &Vec<String>) -> Vec<Line> {
@@ -89,7 +99,7 @@ fn parse_input(data: &Vec<String>) -> Vec<Line> {
 
 mod tests {
     use std::collections::HashSet;
-    use crate::day_05::{Line, parse_input, Point, solve_part_1};
+    use crate::day_05::{Line, parse_input, Point, solve_part_1, solve_part_2};
     use crate::input;
 
     #[test]
@@ -147,19 +157,30 @@ mod tests {
             Line{ start: Point{x:2,y:2}, end: Point{x:2,y:1}}.covered_points(),
             HashSet::from([Point{x:2,y:2}, Point{x:2,y:1}])
         );
-        // Line{ start: Point{x:8,y:0}, end: Point{x:0,y:8}},
-        // Line{ start: Point{x:9,y:4}, end: Point{x:3,y:4}},
-        // Line{ start: Point{x:7,y:0}, end: Point{x:7,y:4}},
-        // Line{ start: Point{x:6,y:4}, end: Point{x:2,y:0}},
-        // Line{ start: Point{x:0,y:9}, end: Point{x:2,y:9}},
-        // Line{ start: Point{x:3,y:4}, end: Point{x:1,y:4}},
-        // Line{ start: Point{x:0,y:0}, end: Point{x:8,y:8}},
-        // Line{ start: Point{x:5,y:5}, end: Point{x:8,y:2}},
+        assert_eq!(
+            Line{ start: Point{x:1,y:1}, end: Point{x:3,y:3}}.covered_points(),
+            HashSet::from([Point{x:1,y:1}, Point{x:2,y:2}, Point{x:3,y:3}])
+        );
+        assert_eq!(
+            Line{ start: Point{x:9,y:7}, end: Point{x:7,y:9}}.covered_points(),
+            HashSet::from([Point{x:9,y:7}, Point{x:8,y:8}, Point{x:7,y:9}])
+        );
     }
 
     #[test]
     fn test_solve_part_2() {
-        assert_eq!(0, 0)
+        assert_eq!(solve_part_2(&vec![
+            Line{ start: Point{x:0,y:9}, end: Point{x:5,y:9}},
+            Line{ start: Point{x:8,y:0}, end: Point{x:0,y:8}},
+            Line{ start: Point{x:9,y:4}, end: Point{x:3,y:4}},
+            Line{ start: Point{x:2,y:2}, end: Point{x:2,y:1}},
+            Line{ start: Point{x:7,y:0}, end: Point{x:7,y:4}},
+            Line{ start: Point{x:6,y:4}, end: Point{x:2,y:0}},
+            Line{ start: Point{x:0,y:9}, end: Point{x:2,y:9}},
+            Line{ start: Point{x:3,y:4}, end: Point{x:1,y:4}},
+            Line{ start: Point{x:0,y:0}, end: Point{x:8,y:8}},
+            Line{ start: Point{x:5,y:5}, end: Point{x:8,y:2}},
+        ]), 12)
     }
 
     #[test]
@@ -168,6 +189,6 @@ mod tests {
         let lines = parse_input(&data);
 
         assert_eq!(solve_part_1(&lines), 6311);
-        assert_eq!(0, 0)
+        assert_eq!(solve_part_2(&lines), 19929);
     }
 }
