@@ -46,7 +46,6 @@ fn window_solution(depths: &Vec<u32>, window_size: u32) -> u32 {
 
 mod tests {
     use crate::day_01::{get_input, solve_part_1, solve_part_2};
-    use crate::input;
 
     #[test]
     fn test_solve_part1() {

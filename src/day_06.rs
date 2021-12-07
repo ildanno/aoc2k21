@@ -21,7 +21,7 @@ fn parse_input(data: &String) -> Vec<u128> {
 
 fn solve(data: &Vec<u128>, i: i32) -> u128 {
     (0..i)
-        .fold(data.clone(), |x, n| {
+        .fold(data.clone(), |x, _n| {
             let mut new_status = x.iter()
                 .map(|&x| { if x == 0 { 6 } else { x - 1 } })
                 .collect::<Vec<u128>>();
@@ -36,7 +36,6 @@ fn solve(data: &Vec<u128>, i: i32) -> u128 {
 
 mod tests {
     use crate::day_06::solve;
-    use crate::input;
 
     #[test]
     fn test_solve_part_1() {

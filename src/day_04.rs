@@ -154,7 +154,7 @@ fn solve_part_1(game: &Game) -> u32 {
     boards
         .iter()
         .filter(|b| b.is_winner())
-        .fold(0, |r, b| b.sum()) * last
+        .fold(0, |_r, b| b.sum()) * last
 }
 
 fn solve_part_2(game: &Game) -> u32 {
@@ -226,7 +226,7 @@ mod tests {
 
     #[test]
     fn test_mark_board() {
-        let mut board = Board {
+        let board = Board {
             cells: [
                 [Cell::new(22), Cell::new(13), Cell::new(17), Cell::new(11), Cell::new(0)],
                 [Cell::new(8), Cell::new(2), Cell::new(23), Cell::new(4), Cell::new(24)],

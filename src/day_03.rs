@@ -1,4 +1,3 @@
-use std::cmp::Ordering;
 use crate::input;
 
 pub fn print_solution() {
@@ -20,7 +19,7 @@ fn solve_part_1(report: &Vec<String>) -> i32 {
         gamma.push_str(most_common_value);
     }
 
-    let mut epsilon = reverse_binary(&gamma);
+    let epsilon = reverse_binary(&gamma);
 
     binstr_to_int(&gamma[..]) * binstr_to_int(&epsilon[..])
 }
@@ -93,9 +92,9 @@ fn criteria_common_value(digits: Vec<u32>, strategy: fn(f64, f64) -> bool) -> &'
         .iter()
         .sum::<u32>() as f64;
 
-    match strategy(sum, (digits.len() as f64 / 2.0)) {
-        true => { "1" }
-        false => { "0" }
+    match strategy(sum, digits.len() as f64 / 2.0) {
+        true => "1",
+        false => "0",
     }
 }
 
