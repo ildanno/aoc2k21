@@ -35,20 +35,20 @@ mod tests {
     #[test]
     fn test_solve_part_1() {
         let input = get_input();
-        assert_eq!(solve_part_1(&input), 0);
+        assert_eq!(solve_part_1(&input), 1);
     }
 
     #[test]
     fn test_solve_part_2() {
         let input = get_input();
-        assert_eq!(solve_part_2(&input), 0);
+        assert_eq!(solve_part_2(&input), 1);
     }
 
     #[test]
     fn test_golden_master() {
         let input = input::read("data/xx.txt");
         let data = parse_input(&input);
-        assert_eq!(solve_part_1(&data), 0);
-        assert_eq!(solve_part_2(&data), 0);
+        assert_eq!(solve_part_1(&data), 1);
+        assert_eq!(solve_part_2(&data), 1);
     }
 }
