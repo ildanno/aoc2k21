@@ -90,10 +90,10 @@ fn decode_signal(signals: &Vec<InputSignal>) -> HashMap<InputSignal, i64> {
     let mut signals = signals.clone();
     let mut hashmap = HashMap::new();
 
-    let digit_1 = signals_with_lenght(&signals, 2).get(0).cloned().expect("");
-    let digit_4 = signals_with_lenght(&signals, 4).get(0).cloned().expect("");
-    let digit_7 = signals_with_lenght(&signals, 3).get(0).cloned().expect("");
-    let digit_8 = signals_with_lenght(&signals, 7).get(0).cloned().expect("");
+    let digit_1 = signals_with_lenght(&signals, 2).get(0).cloned().expect("Not found");
+    let digit_4 = signals_with_lenght(&signals, 4).get(0).cloned().expect("Not found");
+    let digit_7 = signals_with_lenght(&signals, 3).get(0).cloned().expect("Not found");
+    let digit_8 = signals_with_lenght(&signals, 7).get(0).cloned().expect("Not found");
 
     hashmap.insert(digit_1.clone(), 1);
     for h in hashmap.clone() { println!("{:?}", h); } println!("----");
@@ -104,8 +104,8 @@ fn decode_signal(signals: &Vec<InputSignal>) -> HashMap<InputSignal, i64> {
     hashmap.insert(digit_8.clone(), 8);
     for h in hashmap.clone() { println!("{:?}", h); } println!("----");
 
-    let segment_f: char = *segments_with_occurrencies(&signals, 9).get(0).expect("");
-    let digit_2 = signals_with_no_segment(&signals, segment_f).get(0).expect("").clone();
+    let segment_f: char = *segments_with_occurrencies(&signals, 9).get(0).expect("Not found");
+    let digit_2 = signals_with_no_segment(&signals, segment_f).get(0).expect("Not found").clone();
     hashmap.insert(digit_2.clone(), 2);
     for h in hashmap.clone() { println!("{:?}", h); } println!("----");
 
@@ -117,7 +117,7 @@ fn decode_signal(signals: &Vec<InputSignal>) -> HashMap<InputSignal, i64> {
         .collect::<Vec<InputSignal>>()
         .get(0)
         .cloned()
-        .expect("");
+        .expect("Not found");
     hashmap.insert(digit_3.clone(), 3);
     for h in hashmap.clone() { println!("{:?}", h); } println!("----");
 
@@ -129,7 +129,7 @@ fn decode_signal(signals: &Vec<InputSignal>) -> HashMap<InputSignal, i64> {
         .collect::<Vec<InputSignal>>()
         .get(0)
         .cloned()
-        .expect("");
+        .expect("Not found");
     hashmap.insert(digit_5, 5);
     for h in hashmap.clone() { println!("{:?}", h); } println!("----");
 
@@ -154,7 +154,7 @@ fn decode_signal(signals: &Vec<InputSignal>) -> HashMap<InputSignal, i64> {
         .collect::<Vec<InputSignal>>()
         .get(0)
         .cloned()
-        .expect("");
+        .expect("Not found");
     hashmap.insert(digit_0.clone(), 0);
     for h in hashmap.clone() { println!("{:?}", h); } println!("----");
 
@@ -165,7 +165,7 @@ fn decode_signal(signals: &Vec<InputSignal>) -> HashMap<InputSignal, i64> {
         .collect::<Vec<InputSignal>>()
         .get(0)
         .cloned()
-        .expect("");
+        .expect("Not found");
     hashmap.insert(digit_6.clone(), 6);
     for h in hashmap.clone() { println!("{:?}", h); } println!("----");
 
@@ -191,6 +191,22 @@ fn decode_signal(signals: &Vec<InputSignal>) -> HashMap<InputSignal, i64> {
     return hashmap;
 }
 
+fn decode_number(signals_mapping: &HashMap<InputSignal, i64>, numbers: &Vec<InputNumber>) -> i64 {
+    numbers
+        .iter()
+        .fold(0, |output, number| {
+            let m = signals_mapping.iter().fold(0, |a, x| {
+                let mut left_set = x.0.clone();
+                let mut right_set = number.clone();
+                left_set.sort();
+                right_set.sort();
+
+                if left_set.eq(&right_set) { *x.1 } else { a }
+            });
+            output * 10 + m
+        })
+}
+
 fn signals_with_no_segment(signals: &Vec<InputSignal>, segment: char) -> Vec<InputSignal> {
     signals
         .iter()
@@ -203,22 +219,7 @@ fn solve_part_2(data: &Vec<InputLine>) -> i64 {
     data
         .iter()
         .map(|x| {
-            x.numbers.iter().map(|n| {
-                match n.iter().cloned().collect::<String>().trim() {
-                    "acedgfb" => 8,
-                    "cdfbe" => 5,
-                    "gcdfa" => 2,
-                    "fbcad" => 3,
-                    "dab" => 7,
-                    "cefabd" => 9,
-                    "cdfgeb" => 6,
-                    "eafb" => 4,
-                    "cagedb" => 0,
-                    "ab" => 1,
-                    x => { println!("{}", x); -1 },
-                }
-            })
-                .fold(0, |a, g| a * 10 + g)
+            decode_number(&decode_signal(&x.signals), &x.numbers)
         })
         .sum()
     // 0
@@ -227,7 +228,7 @@ fn solve_part_2(data: &Vec<InputLine>) -> i64 {
 mod tests {
     use std::array::IntoIter;
     use std::collections::HashMap;
-    use crate::day_08::{decode_signal, InputLine, InputSignal, parse_input, signals_with_no_segment, solve_part_1, solve_part_2};
+    use crate::day_08::{decode_number, decode_signal, InputLine, InputNumber, InputSignal, parse_input, signals_with_no_segment, solve_part_1, solve_part_2};
     use crate::input;
 
     fn get_input() -> Vec<InputLine> {
@@ -296,6 +297,28 @@ mod tests {
 
         let input = vec![String::from("acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf")];
         assert_eq!(decode_signal(&(parse_input(&input).get(0).expect("Empty").clone().signals)), expected)
+    }
+
+    #[test]
+    fn test_decode_number() {
+        let input_map= HashMap::<_, _>::from_iter(
+            IntoIter::new([
+                (vec!['a','c','e','d','g','f','b'], 8),
+                (vec!['c','d','f','b','e'], 5),
+                (vec!['g','c','d','f','a'], 2),
+                (vec!['f','b','c','a','d'], 3),
+                (vec!['d','a','b'], 7),
+                (vec!['c','e','f','a','b','d'], 9),
+                (vec!['c','d','f','g','e','b'], 6),
+                (vec!['e','a','f','b'], 4),
+                (vec!['c','a','g','e','d','b'], 0),
+                (vec!['a','b'], 1),
+            ])
+        );
+
+        let input = vec![String::from("acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf")];
+        let numbers: Vec<InputNumber> = parse_input(&input).get(0).expect("Empty").clone().numbers;
+        assert_eq!(decode_number(&input_map, &numbers), 5353)
     }
 
     #[test]
