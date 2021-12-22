@@ -12,7 +12,7 @@ pub fn print_solution() {
 
     println!("# Day 08");
     println!("Part 1: {}", solve_part_1(&data));
-    // println!("Part 2: {}", solve_part_2(&data));
+    println!("Part 2: {}", solve_part_2(&data));
 }
 
 fn parse_input(input: &Vec<String>) -> Vec<InputLine> {
@@ -73,7 +73,7 @@ fn signals_with_lenght(signals: &Vec<InputSignal>, lenght: usize) -> Vec<InputSi
 }
 
 fn segments_with_occurrencies(signals: &Vec<InputSignal>, occurrencies: usize) -> Vec<char> {
-    let letters = vec!['a', 'b', 'c', 'd', 'e', 'f'];
+    let letters = vec!['a', 'b', 'c', 'd', 'e', 'f', 'g'];
 
     letters
         .iter()
@@ -96,18 +96,13 @@ fn decode_signal(signals: &Vec<InputSignal>) -> HashMap<InputSignal, i64> {
     let digit_8 = signals_with_lenght(&signals, 7).get(0).cloned().expect("Not found");
 
     hashmap.insert(digit_1.clone(), 1);
-    for h in hashmap.clone() { println!("{:?}", h); } println!("----");
     hashmap.insert(digit_4.clone(), 4);
-    for h in hashmap.clone() { println!("{:?}", h); } println!("----");
     hashmap.insert(digit_7.clone(), 7);
-    for h in hashmap.clone() { println!("{:?}", h); } println!("----");
     hashmap.insert(digit_8.clone(), 8);
-    for h in hashmap.clone() { println!("{:?}", h); } println!("----");
 
     let segment_f: char = *segments_with_occurrencies(&signals, 9).get(0).expect("Not found");
     let digit_2 = signals_with_no_segment(&signals, segment_f).get(0).expect("Not found").clone();
     hashmap.insert(digit_2.clone(), 2);
-    for h in hashmap.clone() { println!("{:?}", h); } println!("----");
 
     let digit_1_segments: HashSet<char> = HashSet::from_iter(digit_1.clone());
     let digit_3 = signals_with_lenght(&signals, 5)
@@ -119,7 +114,6 @@ fn decode_signal(signals: &Vec<InputSignal>) -> HashMap<InputSignal, i64> {
         .cloned()
         .expect("Not found");
     hashmap.insert(digit_3.clone(), 3);
-    for h in hashmap.clone() { println!("{:?}", h); } println!("----");
 
     let digit_5 = signals
         .iter()
@@ -131,7 +125,6 @@ fn decode_signal(signals: &Vec<InputSignal>) -> HashMap<InputSignal, i64> {
         .cloned()
         .expect("Not found");
     hashmap.insert(digit_5, 5);
-    for h in hashmap.clone() { println!("{:?}", h); } println!("----");
 
     let digit_4_segments: HashSet<char> = HashSet::from_iter(digit_4.clone());
     let digit_9 = signals_with_lenght(&signals, 6)
@@ -143,7 +136,6 @@ fn decode_signal(signals: &Vec<InputSignal>) -> HashMap<InputSignal, i64> {
         .cloned()
         .expect("");
     hashmap.insert(digit_9.clone(), 9);
-    for h in hashmap.clone() { println!("{:?}", h); } println!("----");
 
     let digit_7_segments: HashSet<char> = HashSet::from_iter(digit_7.clone());
     let digit_0 = signals_with_lenght(&signals, 6)
@@ -156,7 +148,6 @@ fn decode_signal(signals: &Vec<InputSignal>) -> HashMap<InputSignal, i64> {
         .cloned()
         .expect("Not found");
     hashmap.insert(digit_0.clone(), 0);
-    for h in hashmap.clone() { println!("{:?}", h); } println!("----");
 
     let digit_6 = signals
         .iter()
@@ -167,7 +158,6 @@ fn decode_signal(signals: &Vec<InputSignal>) -> HashMap<InputSignal, i64> {
         .cloned()
         .expect("Not found");
     hashmap.insert(digit_6.clone(), 6);
-    for h in hashmap.clone() { println!("{:?}", h); } println!("----");
 
     // digit 1: L2 (unico)
     // digit 7: L3 (unico)
@@ -344,6 +334,6 @@ mod tests {
         let input = input::read("data/08.txt");
         let data = parse_input(&input);
         assert_eq!(solve_part_1(&data), 456);
-        // assert_eq!(solve_part_2(&data), 1);
+        assert_eq!(solve_part_2(&data), 1091609);
     }
 }
