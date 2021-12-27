@@ -51,8 +51,8 @@ fn parse_input(input: &Vec<String>) -> Vec<Vec<i8>> {
         .collect::<Vec<Vec<i8>>>()
 }
 
-fn decode_input(input: &Vec<Vec<i8>>) -> Vec<Vec<Point>> {
-    input
+fn decode_input(input: &Vec<Vec<i8>>) -> Heightmap {
+    let points = input
         .into_iter()
         .enumerate()
         .map(|x| {
@@ -64,12 +64,12 @@ fn decode_input(input: &Vec<Vec<i8>>) -> Vec<Vec<Point>> {
                 })
                 .collect::<Vec<Point>>()
         })
-        .collect::<Vec<Vec<Point>>>()
+        .collect::<Vec<Vec<Point>>>();
+
+    return Heightmap {points: points.clone()};
 }
 
-fn solve_part_1(data: &Vec<Vec<Point>>) -> i64 {
-    let map = Heightmap {points: data.clone()};
-
+fn solve_part_1(map: &Heightmap) -> i64 {
     map.points
         .iter()
         .enumerate()
@@ -108,12 +108,12 @@ fn solve_part_1(data: &Vec<Vec<Point>>) -> i64 {
         .sum()
 }
 
-fn solve_part_2(data: &Vec<Vec<Point>>) -> i64 {
+fn solve_part_2(map: &Heightmap) -> i64 {
     0
 }
 
 mod tests {
-    use crate::day_09::{decode_input, parse_input, Point, solve_part_1, solve_part_2};
+    use crate::day_09::{decode_input, Heightmap, parse_input, Point, solve_part_1, solve_part_2};
     use crate::input;
 
     fn get_input() -> Vec<Vec<i8>> {
@@ -141,70 +141,76 @@ mod tests {
 
     #[test]
     fn test_decode_input() {
-        let expected = vec![
-            vec![
-                Point { y: 0, x: 0, z: 2},
-                Point { y: 0, x: 1, z: 1},
-                Point { y: 0, x: 2, z: 9},
-                Point { y: 0, x: 3, z: 9},
-                Point { y: 0, x: 4, z: 9},
-                Point { y: 0, x: 5, z: 4},
-                Point { y: 0, x: 6, z: 3},
-                Point { y: 0, x: 7, z: 2},
-                Point { y: 0, x: 8, z: 1},
-                Point { y: 0, x: 9, z: 0},
-            ],
-            vec![
-                Point { y: 1, x: 0, z: 3},
-                Point { y: 1, x: 1, z: 9},
-                Point { y: 1, x: 2, z: 8},
-                Point { y: 1, x: 3, z: 7},
-                Point { y: 1, x: 4, z: 8},
-                Point { y: 1, x: 5, z: 9},
-                Point { y: 1, x: 6, z: 4},
-                Point { y: 1, x: 7, z: 9},
-                Point { y: 1, x: 8, z: 2},
-                Point { y: 1, x: 9, z: 1},
-            ],
-            vec![
-                Point { y: 2, x: 0, z: 9},
-                Point { y: 2, x: 1, z: 8},
-                Point { y: 2, x: 2, z: 5},
-                Point { y: 2, x: 3, z: 6},
-                Point { y: 2, x: 4, z: 7},
-                Point { y: 2, x: 5, z: 8},
-                Point { y: 2, x: 6, z: 9},
-                Point { y: 2, x: 7, z: 8},
-                Point { y: 2, x: 8, z: 9},
-                Point { y: 2, x: 9, z: 2},
-            ],
-            vec![
-                Point { y: 3, x: 0, z: 8},
-                Point { y: 3, x: 1, z: 7},
-                Point { y: 3, x: 2, z: 6},
-                Point { y: 3, x: 3, z: 7},
-                Point { y: 3, x: 4, z: 8},
-                Point { y: 3, x: 5, z: 9},
-                Point { y: 3, x: 6, z: 6},
-                Point { y: 3, x: 7, z: 7},
-                Point { y: 3, x: 8, z: 8},
-                Point { y: 3, x: 9, z: 9},
-            ],
-            vec![
-                Point { y: 4, x: 0, z: 9},
-                Point { y: 4, x: 1, z: 8},
-                Point { y: 4, x: 2, z: 9},
-                Point { y: 4, x: 3, z: 9},
-                Point { y: 4, x: 4, z: 9},
-                Point { y: 4, x: 5, z: 6},
-                Point { y: 4, x: 6, z: 5},
-                Point { y: 4, x: 7, z: 6},
-                Point { y: 4, x: 8, z: 7},
-                Point { y: 4, x: 9, z: 8},
-            ],
-        ];
+        let expected = get_map();
 
         assert_eq!(decode_input(&get_input()), expected)
+    }
+
+    fn get_map() -> Heightmap {
+        Heightmap {
+            points: vec![
+                vec![
+                    Point { y: 0, x: 0, z: 2 },
+                    Point { y: 0, x: 1, z: 1 },
+                    Point { y: 0, x: 2, z: 9 },
+                    Point { y: 0, x: 3, z: 9 },
+                    Point { y: 0, x: 4, z: 9 },
+                    Point { y: 0, x: 5, z: 4 },
+                    Point { y: 0, x: 6, z: 3 },
+                    Point { y: 0, x: 7, z: 2 },
+                    Point { y: 0, x: 8, z: 1 },
+                    Point { y: 0, x: 9, z: 0 },
+                ],
+                vec![
+                    Point { y: 1, x: 0, z: 3 },
+                    Point { y: 1, x: 1, z: 9 },
+                    Point { y: 1, x: 2, z: 8 },
+                    Point { y: 1, x: 3, z: 7 },
+                    Point { y: 1, x: 4, z: 8 },
+                    Point { y: 1, x: 5, z: 9 },
+                    Point { y: 1, x: 6, z: 4 },
+                    Point { y: 1, x: 7, z: 9 },
+                    Point { y: 1, x: 8, z: 2 },
+                    Point { y: 1, x: 9, z: 1 },
+                ],
+                vec![
+                    Point { y: 2, x: 0, z: 9 },
+                    Point { y: 2, x: 1, z: 8 },
+                    Point { y: 2, x: 2, z: 5 },
+                    Point { y: 2, x: 3, z: 6 },
+                    Point { y: 2, x: 4, z: 7 },
+                    Point { y: 2, x: 5, z: 8 },
+                    Point { y: 2, x: 6, z: 9 },
+                    Point { y: 2, x: 7, z: 8 },
+                    Point { y: 2, x: 8, z: 9 },
+                    Point { y: 2, x: 9, z: 2 },
+                ],
+                vec![
+                    Point { y: 3, x: 0, z: 8 },
+                    Point { y: 3, x: 1, z: 7 },
+                    Point { y: 3, x: 2, z: 6 },
+                    Point { y: 3, x: 3, z: 7 },
+                    Point { y: 3, x: 4, z: 8 },
+                    Point { y: 3, x: 5, z: 9 },
+                    Point { y: 3, x: 6, z: 6 },
+                    Point { y: 3, x: 7, z: 7 },
+                    Point { y: 3, x: 8, z: 8 },
+                    Point { y: 3, x: 9, z: 9 },
+                ],
+                vec![
+                    Point { y: 4, x: 0, z: 9 },
+                    Point { y: 4, x: 1, z: 8 },
+                    Point { y: 4, x: 2, z: 9 },
+                    Point { y: 4, x: 3, z: 9 },
+                    Point { y: 4, x: 4, z: 9 },
+                    Point { y: 4, x: 5, z: 6 },
+                    Point { y: 4, x: 6, z: 5 },
+                    Point { y: 4, x: 7, z: 6 },
+                    Point { y: 4, x: 8, z: 7 },
+                    Point { y: 4, x: 9, z: 8 },
+                ],
+            ]
+        }
     }
 
     #[test]
