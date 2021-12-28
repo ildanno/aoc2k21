@@ -6,7 +6,7 @@ pub fn print_solution() {
 
     println!("# Day 09");
     println!("Part 1: {}", solve_part_1(&data));
-    // println!("Part 2: {}", solve_part_2(&data));
+    println!("Part 2: {}", solve_part_2(&data));
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -70,6 +70,13 @@ fn decode_input(input: &Vec<Vec<i8>>) -> Heightmap {
 }
 
 fn solve_part_1(map: &Heightmap) -> i64 {
+    lowers(map)
+        .iter()
+        .map(|p| p.z as i64 + 1)
+        .sum()
+}
+
+fn lowers(map: &Heightmap) -> Vec<Point> {
     map.points
         .iter()
         .enumerate()
@@ -103,17 +110,72 @@ fn solve_part_1(map: &Heightmap) -> i64 {
 
             return lowers.clone();
         })
-        .iter()
-        .map(|p| p.z as i64 + 1)
-        .sum()
 }
 
 fn solve_part_2(map: &Heightmap) -> i64 {
-    0
+    let low = lowers(map);
+    let basins = low
+        .iter()
+        .map(|p| basin(map, p, &vec![]))
+        .collect::<Vec<Vec<Point>>>()
+        ;
+
+    let mut b_lenghts = basins
+        .iter()
+        .map(|b| b.len())
+        .collect::<Vec<usize>>();
+
+    (0..3).into_iter()
+        .fold(0, |c, _| {
+            let max = *b_lenghts.iter().max().unwrap();
+            let index = b_lenghts.iter().position(|x| *x == max).unwrap();
+            b_lenghts.remove(index);
+
+            c + max as i64
+        })
+}
+
+fn basin(map: &Heightmap, point: &Point, starting: &Vec<Point>) -> Vec<Point> {
+    // println!("Inspecting point {:?}", point);
+    if starting.contains(point) {
+        // println!("Inspected point {:?} already in basin", point);
+        return starting.clone();
+    }
+    let mut points = starting.clone();
+    points.append(&mut vec![point.clone()]);
+    let mut new_points = vec![point.clone()];
+    for i in ["up","right","down","left"] {
+        let next = match i {
+            "up" => map.up(point),
+            "right" => map.right(point),
+            "down" => map.down(point),
+            "left" => map.left(point),
+            _ => None
+        };
+        match next {
+            Some(p) if points.contains(&p) => {
+                // println!("{:?} already there", p)
+            },
+            Some(p) if p.z == 9 => {
+                // println!("{:?} is high, not basin", p)
+            },
+            Some(p) => {
+                // println!("Next point ({}): {:?}", i, p);
+                let mut n = basin(&map, &p, &points);
+                points.append(&mut n.clone());
+                new_points.append(&mut n);
+            },
+            None => {
+                // println!("No options for {}", i);
+            }
+        }
+    }
+
+    return new_points.clone()
 }
 
 mod tests {
-    use crate::day_09::{decode_input, Heightmap, parse_input, Point, solve_part_1, solve_part_2};
+    use crate::day_09::{basin, decode_input, Heightmap, parse_input, Point, solve_part_1, solve_part_2};
     use crate::input;
 
     fn get_input() -> Vec<Vec<i8>> {
@@ -124,26 +186,6 @@ mod tests {
             vec![8, 7, 6, 7, 8, 9, 6, 7, 8, 9],
             vec![9, 8, 9, 9, 9, 6, 5, 6, 7, 8],
         ]
-    }
-
-    #[test]
-    fn test_parse_input() {
-        let input = vec![
-            "2199943210".to_string(),
-            "3987894921".to_string(),
-            "9856789892".to_string(),
-            "8767896789".to_string(),
-            "9899965678".to_string(),
-        ];
-
-        assert_eq!(parse_input(&input), get_input())
-    }
-
-    #[test]
-    fn test_decode_input() {
-        let expected = get_map();
-
-        assert_eq!(decode_input(&get_input()), expected)
     }
 
     fn get_map() -> Heightmap {
@@ -214,6 +256,37 @@ mod tests {
     }
 
     #[test]
+    fn test_parse_input() {
+        let input = vec![
+            "2199943210".to_string(),
+            "3987894921".to_string(),
+            "9856789892".to_string(),
+            "8767896789".to_string(),
+            "9899965678".to_string(),
+        ];
+
+        assert_eq!(parse_input(&input), get_input())
+    }
+
+    #[test]
+    fn test_decode_input() {
+        let expected = get_map();
+
+        assert_eq!(decode_input(&get_input()), expected)
+    }
+
+    #[test]
+    fn test_basin() {
+        let map = get_map();
+        let lower_point = Point { y: 0, x: 0, z: 2 };
+        let expected1 = vec![
+            lower_point,
+            Point{y:0, x:1, z:1},
+            Point{y:1, x:0, z:3},
+        ];
+        assert_eq!(basin(&map, &lower_point, &vec![]), expected1)
+    }
+    #[test]
     fn test_solve_part_1() {
         let input = get_input();
         assert_eq!(solve_part_1(&decode_input(&input)), 15);
@@ -222,7 +295,7 @@ mod tests {
     #[test]
     fn test_solve_part_2() {
         let input = get_input();
-        assert_eq!(solve_part_2(&decode_input(&input)), 1);
+        assert_eq!(solve_part_2(&decode_input(&input)), 1134);
     }
 
     #[test]
