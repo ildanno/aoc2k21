@@ -126,12 +126,12 @@ fn solve_part_2(map: &Heightmap) -> i64 {
         .collect::<Vec<usize>>();
 
     (0..3).into_iter()
-        .fold(0, |c, _| {
+        .fold(1, |c, _| {
             let max = *b_lenghts.iter().max().unwrap();
             let index = b_lenghts.iter().position(|x| *x == max).unwrap();
             b_lenghts.remove(index);
 
-            c + max as i64
+            c * max as i64
         })
 }
 
@@ -303,6 +303,6 @@ mod tests {
         let input = input::read("data/09.txt");
         let data = parse_input(&input);
         assert_eq!(solve_part_1(&decode_input(&data)), 564);
-        // assert_eq!(solve_part_2(&decode_input(&data)), 1);
+        assert_eq!(solve_part_2(&decode_input(&data)), 1038240);
     }
 }
