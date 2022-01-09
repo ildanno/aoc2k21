@@ -8,9 +8,10 @@ mod day_06;
 mod day_07;
 mod day_08;
 mod day_09;
+mod day_10;
 
 fn main() {
-    let day = 9;
+    let day = 10;
 
     match day {
         1 => day_01::print_solution(),
@@ -22,6 +23,7 @@ fn main() {
         7 => day_07::print_solution(),
         8 => day_08::print_solution(),
         9 => day_09::print_solution(),
+        10 => day_10::print_solution(),
         _ => println!("Day {} is not implemented", day)
     }
 }
