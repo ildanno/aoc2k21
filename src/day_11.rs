@@ -70,7 +70,7 @@ impl Grid {
         return sum + 1 as i64;
     }
 
-    fn flash_all(&mut self) -> i64 {
+    fn  flash_all(&mut self) -> i64 {
         let flashes = self
             .search(10)
             .iter()
@@ -87,11 +87,12 @@ impl Grid {
 
 pub fn print_solution() {
     let input = input::read("data/11.txt");
-    let mut data = parse_input(&input);
+    let mut data1 = parse_input(&input);
+    let mut data2 = parse_input(&input);
 
     println!("# Day 11");
-    println!("Part 1: {}", solve_part_1(&mut data));
-    println!("Part 2: {}", solve_part_2(&data));
+    println!("Part 1: {}", solve_part_1(&mut data1));
+    println!("Part 2: {}", solve_part_2(&mut data2));
 }
 
 fn parse_input(input: &Vec<String>) -> Grid {
@@ -117,8 +118,16 @@ fn solve_part_1(grid: &mut Grid) -> i64 {
         })
 }
 
-fn solve_part_2(data: &Grid) -> i64 {
-    0
+fn solve_part_2(grid: &mut Grid) -> i64 {
+    for step in 1..=i64::MAX {
+        grid.increase_all();
+        grid.flash_all();
+        if grid.search(0).len() == 100 {
+            return step;
+        }
+    }
+
+    return 0
 }
 
 mod tests {
@@ -176,15 +185,16 @@ mod tests {
 
     #[test]
     fn test_solve_part_2() {
-        let input = get_input();
-        assert_eq!(solve_part_2(&input), 1);
+        let mut input = get_input();
+        assert_eq!(solve_part_2(&mut input), 195);
     }
 
     #[test]
     fn test_golden_master() {
         let input = input::read("data/11.txt");
-        let mut data = parse_input(&input);
-        assert_eq!(solve_part_1(&mut data), 1673);
-        assert_eq!(solve_part_2(&data), 1);
+        let mut data1 = parse_input(&input);
+        let mut data2 = parse_input(&input);
+        assert_eq!(solve_part_1(&mut data1), 1673);
+        assert_eq!(solve_part_2(&mut data2), 279);
     }
 }
